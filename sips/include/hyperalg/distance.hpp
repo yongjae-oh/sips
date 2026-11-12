@@ -93,6 +93,11 @@ struct cartesian_distance {
     inline void put_atom_in_box(double * const xnew, const double* x) const
     {
         // throw std::runtime_error("Cartesian distance, CellLists: coords are outside of boxvector");
+        //// 261113 YO
+        for (size_t k = 0; k < ndim; ++k){
+            xnew[k] = x[k];
+        }
+        ////
     }
     inline void put_atom_in_box(double * const x) const
     {
