@@ -64,5 +64,9 @@ PYBIND11_MODULE(sips, m) {
     bind_inversepower_effective_rr<inversepower_effective_rr_harmonic_clist<3> >(m_a,"InversePowerEffectiveRRHarmonicCList3D");
     bind_inversepower_effective_rr<inversepower_effective_rr_harmonic_clist<4> >(m_a,"InversePowerEffectiveRRHarmonicCList4D");
     /*----inversepower random reshuffling SGD (with cell lists)----*/
-        // TBA
+        // 261113 YO
+        // bind name is still effetive_rr but this is for ground truth RR-SGD
+    bind_inversepower_effective_rr<inversepower_rr_sgd_periodic_clist<2> >(m_a,"InversePowerRRSGDPeriodicCList2D");
+    bind_inversepower_effective_rr<inversepower_rr_sgd_periodic_clist<3> >(m_a,"InversePowerRRSGDPeriodicCList3D");
+    bind_inversepower_effective_rr<inversepower_rr_sgd_periodic_clist<4> >(m_a,"InversePowerRRSGDPeriodicCList4D");
 }
