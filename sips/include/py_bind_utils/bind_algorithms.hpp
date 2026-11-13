@@ -90,6 +90,14 @@ void bind_inversepower_sgd(py::module& m,std::string class_name){
                   py::arg("radii"),
                   py::arg("box_size"),py::arg("x0"),
                   py::arg("ncellx_scale")=1.0,py::arg("balance_omp")=true)
+     /****************/
+     // use not only run() but also step, position after step (coordinates), and energy
+          // 261113 YO
+     /********/
+    .def("step",&T::step)
+    .def("coordinates",&T::coordinates)
+    .def("energy",&T::energy)
+     /********/
     .def("run",&T::run,"run the algorithm",
          py::arg("n_steps"),py::arg("n_save"),py::arg("n_rec"),
          py::arg("starting_step")=0,
@@ -99,6 +107,7 @@ void bind_inversepower_sgd(py::module& m,std::string class_name){
          py::arg("compression") = false)
     .def("set_zoom_steps",&T::set_zoom_steps,
           py::arg("starting_step"),py::arg("ending_step"),py::arg("zoom_rate"));
+     /****************/
 }
 
 // this is the helper function for py_bind [INVERSEPOWER_CORRELATED_SGD] classes
@@ -199,6 +208,45 @@ void bind_inversepower_correlated_undirected_sd(py::module& m,std::string class_
          py::arg("compression") = false)
     .def("set_zoom_steps",&T::set_zoom_steps,
           py::arg("starting_step"),py::arg("ending_step"),py::arg("zoom_rate"));
+}
+
+
+// RR-SGD and its effective process (share this generator)
+     // seed: random seed of slot or MA noise
+     // run() actually runs saves the simulation, while step() executes a step independently with run()
+template <typename T>
+void bind_inversepower_effective_rr(py::module& m,std::string class_name){
+    py::class_<T>(m,class_name.c_str())
+    .def(py::init<double, double, double, double, double, double, unsigned long long,
+                  std::vector<double> const,
+                  std::vector<double> const,
+                  std::vector<double>,
+                  const double, const bool>(),
+                  py::arg("mpow"),py::arg("a"),py::arg("alpha"),py::arg("bf"),
+                  py::arg("c"),py::arg("kappa"),py::arg("seed"),
+                  py::arg("radii"),
+                  py::arg("box_size"),py::arg("x0"),
+                  py::arg("ncellx_scale")=1.0,py::arg("balance_omp")=true)
+    .def("run",&T::run,"run the algorithm",
+         py::arg("n_steps"),py::arg("n_save"),py::arg("n_rec"),
+         py::arg("starting_step")=0,
+         py::arg("cutoff")=1.0,
+         py::arg("output_dir") = "./",
+         py::arg("save_mode") = "concise",
+         py::arg("compression") = false)
+    .def("set_zoom_steps",&T::set_zoom_steps,
+          py::arg("starting_step"),py::arg("ending_step"),py::arg("zoom_rate"))
+    .def("step",&T::one_step,"one Euler step of the effective process")
+    .def("coordinates",&T::coordinates,"coordinates after the last step")
+    .def("energy",&T::energy,"inverse-power pair energy")
+    .def("pair_displacement_sum",&T::pair_displacement_sum,
+         "sum of pair displacements, excluding the harmonic trap")
+    
+         // for autocorr and PSD
+    .def("enable_selection_trace",&T::enable_selection_trace,
+         "record the selection factor used by the existing update")
+    .def("selection_trace",&T::selection_trace,
+         "recorded theta (RR) or zeta (effective), one value per pair per step");
 }
 
 #endif
