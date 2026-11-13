@@ -5,7 +5,11 @@ cmake_minimum_required(VERSION 3.10)
 project(sips LANGUAGES CXX)
 
 # set the cpp standard
-set(CMAKE_CXX_STANDARD 11)
+# set(CMAKE_CXX_STANDARD 11)
+    # environment reason (pybind11 3.1 requires C++14)
+        # 261113 YO
+set(CMAKE_CXX_STANDARD 14)
+    ####
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -15,8 +19,14 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # optimization level O3
 # position-independent code for shared libray -fPIC
 # for the host machine -march-native
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -O3 -fPIC -march=native -flto")
-
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -O3 -fPIC -march=native -flto")
+    # environment reason
+        # 261113 YO
+if(MSVC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W3 /EHsc /bigobj /openmp")
+else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -O3 -fPIC -march=native -flto")
+endif()
 
 # find python and pybind11
 set(PYBIND11_FINDPYTHON ON)
