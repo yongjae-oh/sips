@@ -55,4 +55,14 @@ PYBIND11_MODULE(sips, m) {
     bind_inversepower_correlated_undirected_sd<inversepower_correlated_pairwise_undirected_sd_clist<2> >(m_a,"InversePowerCorrelatedPairwiseUndirectedStoDynCList2D");
     bind_inversepower_correlated_undirected_sd<inversepower_correlated_pairwise_undirected_sd_clist<3> >(m_a,"InversePowerCorrelatedPairwiseUndirectedStoDynCList3D");
     bind_inversepower_correlated_undirected_sd<inversepower_correlated_pairwise_undirected_sd_clist<4> >(m_a,"InversePowerCorrelatedPairwiseUndirectedStoDynCList4D");
+    /*----inversepower effective SDE of random reshuffling SGD (with cell lists)----*/
+        // 261113 YO
+    bind_inversepower_effective_rr<inversepower_effective_rr_periodic_clist<2> >(m_a,"InversePowerEffectiveRRPeriodicCList2D");
+    bind_inversepower_effective_rr<inversepower_effective_rr_periodic_clist<3> >(m_a,"InversePowerEffectiveRRPeriodicCList3D");
+    bind_inversepower_effective_rr<inversepower_effective_rr_periodic_clist<4> >(m_a,"InversePowerEffectiveRRPeriodicCList4D");
+    bind_inversepower_effective_rr<inversepower_effective_rr_harmonic_clist<2> >(m_a,"InversePowerEffectiveRRHarmonicCList2D");
+    bind_inversepower_effective_rr<inversepower_effective_rr_harmonic_clist<3> >(m_a,"InversePowerEffectiveRRHarmonicCList3D");
+    bind_inversepower_effective_rr<inversepower_effective_rr_harmonic_clist<4> >(m_a,"InversePowerEffectiveRRHarmonicCList4D");
+    /*----inversepower random reshuffling SGD (with cell lists)----*/
+        // TBA
 }
