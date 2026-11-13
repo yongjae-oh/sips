@@ -211,7 +211,7 @@ void bind_inversepower_correlated_undirected_sd(py::module& m,std::string class_
 }
 
 
-// RR-SGD and its effective process (share this generator)
+// RR-SGD and its effective process (share this constructor)
      // seed: random seed of slot or MA noise
      // run() actually runs saves the simulation, while step() executes a step independently with run()
 template <typename T>
