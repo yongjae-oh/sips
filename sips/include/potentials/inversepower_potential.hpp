@@ -19,6 +19,10 @@
 #include "sips/cell_list_potential_with_undirected_noise.hpp"
 //#include "sips/cell_list_potential_with_selective_batch.hpp"
 
+// new include
+#include "sips/cell_list_potential_with_effective_rr.hpp"
+#include "sips/cell_list_potential_with_rr_sgd.hpp"
+
 namespace ha{
     
 class InversePowerInteraction : public ha::BaseInteraction{
@@ -593,6 +597,71 @@ public:
         double m_alpha,m_D0;
 
 };
+
+
+
+// link the effective SDE of RR-SGD to inverse-power potential and periodic distance
+    // 261113 YO
+template <size_t ndim>
+class InversePowerPeriodicEffectiveRRCellLists
+    : public EffectiveRRCellListPotential<ha::InversePowerInteraction, ha::periodic_distance<ndim> > {
+public:
+    const std::vector<double> m_boxv;
+    const size_t m_ndim;
+    InversePowerPeriodicEffectiveRRCellLists(
+        double pow, double eps, double alpha, double bf, double c, double kappa,
+        unsigned long long seed,
+        std::vector<double> const radii, std::vector<double> const boxv,
+        const double ncellx_scale=1.0, const bool balance_omp=true)
+        : EffectiveRRCellListPotential<ha::InversePowerInteraction, ha::periodic_distance<ndim> >(
+            std::make_shared<ha::InversePowerInteraction>(pow, eps),
+            std::make_shared<ha::periodic_distance<ndim> >(boxv),
+            boxv,
+            2.0 * (*std::max_element(radii.begin(), radii.end())),
+            ncellx_scale,
+            radii,
+            alpha, bf, c, kappa, seed, balance_omp),
+          m_boxv(boxv),
+          m_ndim(ndim)
+    {}
+    void wrap(std::vector<double>& coords){
+        this->m_dist->put_in_box(coords);
+    }
+};
+
+// link the effective SDE of RR-SGD to Cartesian (non-periodic) distance for harmonic potential
+    // 261113 YO
+template <size_t ndim>
+class InversePowerCartesianEffectiveRRCellLists
+    : public EffectiveRRCellListPotential<ha::InversePowerInteraction, ha::cartesian_distance<ndim> > {
+public:
+    const std::vector<double> m_boxv;
+    const size_t m_ndim;
+    InversePowerCartesianEffectiveRRCellLists(
+        double pow, double eps, double alpha, double bf, double c, double kappa,
+        unsigned long long seed,
+        std::vector<double> const radii, std::vector<double> const boxv,
+        const double ncellx_scale=1.0, const bool balance_omp=true)
+        : EffectiveRRCellListPotential<ha::InversePowerInteraction, ha::cartesian_distance<ndim> >(
+            std::make_shared<ha::InversePowerInteraction>(pow, eps),
+            std::make_shared<ha::cartesian_distance<ndim> >(),
+            boxv,
+            2.0 * (*std::max_element(radii.begin(), radii.end())),
+            ncellx_scale,
+            radii,
+            alpha, bf, c, kappa, seed, balance_omp),
+          m_boxv(boxv),
+          m_ndim(ndim)
+    {}
+};
+
+
+// link the RR-SGD to inverse-power potential and periodic distance
+    // TBA
+
+
+// link the RR-SGD to Cartesian (non-periodic) distance for harmonic potential
+    // TBA
 
 }
 
