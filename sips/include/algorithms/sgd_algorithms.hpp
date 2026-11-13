@@ -15,6 +15,13 @@ public:
                     std::make_shared<ha::InversePowerPeriodicProbabilisticPairBatchCellLists<ndim> >(pow,eps,lr,prob,radii,boxv,ncellx_scale,balance_omp),
                      boxv,init_coords)
                 {}
+    
+    // pass not only run() but also step, position after step, and inversepower pair energy
+        // 261113 YO
+        // for original pairwise SGD
+    void step(){ this->one_step(); }
+    std::vector<double> coordinates() const { return this->m_coords; }
+    double energy(){ return (this->m_potential)->get_energy(this->m_coords); }
 };
 
 template<size_t ndim>
@@ -28,6 +35,13 @@ public:
                     std::make_shared<ha::InversePowerPeriodicProbabilisticParticleBatchCellLists<ndim> >(pow,eps,lr,prob,radii,boxv,ncellx_scale,balance_omp),
                      boxv,init_coords)
                 {}
+    
+    // pass not only run() but also step, position after step, and inversepower pair energy
+        // 261113 YO
+        // for original particle-wise SGD
+    void step(){ this->one_step(); }
+    std::vector<double> coordinates() const { return this->m_coords; }
+    double energy(){ return (this->m_potential)->get_energy(this->m_coords); }
 };
 
 template<size_t ndim>
