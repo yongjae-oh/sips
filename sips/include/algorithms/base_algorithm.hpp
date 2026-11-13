@@ -44,10 +44,20 @@ public:
     virtual void one_step(){   
         (this->m_potential)->get_displacement(this->m_coords,this->m_grad);
         #ifdef _OPENMP
+        
+        /*
         #pragma omp parallel for
         for (size_t i = 0; i<m_coords.size();i++){
             this->m_coords[i] += this->m_grad[i];
         }
+        */
+            // size_t -> int due to Visual C++ OpenMP
+            // 261113 YO
+        #pragma omp parallel for
+        for (int i = 0; i < (int)m_coords.size(); ++i){
+            this->m_coords[i] += this->m_grad[i];
+        }
+
         #else
         for (size_t i = 0; i<this->m_coords.size();i++){
             this->m_coords[i] += this->m_grad[i];
@@ -57,8 +67,14 @@ public:
 
     virtual void run(size_t n_steps, size_t n_save, size_t n_rec, 
                     size_t current_step = 0, double cutoff_factor = 1.0,
+                    
+                    /*
                     std::string output_dir='./',
                     std::string save_mode = 'concise',
+                    */
+                        // 261113 YO: '~' to "~" (\because Visual C++)
+                    std::string output_dir="./",
+                    std::string save_mode = "concise",
                     bool compression = false){
         throw std::runtime_error("need to implement/override this method");
     }
@@ -70,12 +86,23 @@ public:
         get_neighbors();
         size_t n_active = 0;
         #ifdef _OPENMP
+        /*
         #pragma omp parallel for reduction(+:n_active)
         for (size_t i=0;i< this->m_natoms; i++){
             if (this->m_nbr[i].size() > 0){
                 n_active++;
             }
         }
+        */
+        // size_t -> int due to Visual C++ OpenMP
+            // 261113 YO
+         #pragma omp parallel for reduction(+:n_active)
+        for (int i = 0; i < (int)this->m_natoms; ++i){
+            if (this->m_nbr[i].size() > 0){
+                n_active++;
+            }
+        }
+
         #else
         for (size_t i=0;i<this->m_natoms; i++){
             if (this->m_nbr[i].size() > 0){
@@ -181,8 +208,13 @@ public:
 
     virtual void run(size_t n_steps, size_t n_save, size_t n_rec, 
                     size_t current_step = 0, double cutoff_factor = 1.0,
+                    /* 
                      std::string output_dir='./', 
                      std::string save_mode = 'concise',
+                     */
+                     // 261113 YO: '~' to "~" (\because Visual C++)
+                     std::string output_dir="./",
+                     std::string save_mode = "concise",
                      bool compression = false){
 
         this->m_current_step = current_step;
@@ -304,8 +336,13 @@ public:
 
     virtual void run(size_t n_steps, size_t n_save, size_t n_rec, 
                     size_t current_step = 0, double cutoff_factor = 1.0,
+                    /*
                     std::string output_dir='./', 
                     std::string save_mode = 'concise',
+                    */
+                        // 261113 YO: '~' to "~" (\because Visual C++)
+                    std::string output_dir="./",
+                    std::string save_mode = "concise",
                     bool compression = false){
         this->m_current_step = current_step;
         this->m_cutoff_factor = cutoff_factor;
