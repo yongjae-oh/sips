@@ -657,8 +657,33 @@ public:
 
 
 // link the RR-SGD to inverse-power potential and periodic distance
-    // TBA
-
+    // 261113 YO
+template <size_t ndim>
+class InversePowerPeriodicRRSGDCellLists
+    : public RRSGDCellListPotential<ha::InversePowerInteraction, ha::periodic_distance<ndim> > {
+public:
+    const std::vector<double> m_boxv;
+    const size_t m_ndim;
+    InversePowerPeriodicRRSGDCellLists(
+        double pow, double eps, double alpha, double bf, double c, double kappa,
+        unsigned long long seed,
+        std::vector<double> const radii, std::vector<double> const boxv,
+        const double ncellx_scale=1.0, const bool balance_omp=true)
+        : RRSGDCellListPotential<ha::InversePowerInteraction, ha::periodic_distance<ndim> >(
+            std::make_shared<ha::InversePowerInteraction>(pow, eps),
+            std::make_shared<ha::periodic_distance<ndim> >(boxv),
+            boxv,
+            2.0 * (*std::max_element(radii.begin(), radii.end())),
+            ncellx_scale,
+            radii,
+            alpha, bf, c, kappa, seed, balance_omp),
+          m_boxv(boxv),
+          m_ndim(ndim)
+    {}
+    void wrap(std::vector<double>& coords){
+        this->m_dist->put_in_box(coords);
+    }
+};
 
 // link the RR-SGD to Cartesian (non-periodic) distance for harmonic potential
     // TBA
