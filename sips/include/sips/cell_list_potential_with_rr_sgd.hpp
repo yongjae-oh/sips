@@ -1,5 +1,5 @@
-#ifndef SIPS_CELL_LIST_POTENTIAL_WITH_PROBABILISTIC_BATCH_HPP
-#define SIPS_CELL_LIST_POTENTIAL_WITH_PROBABILISTIC_BATCH_HPP
+#ifndef SIPS_CELL_LIST_POTENTIAL_WITH_RR_SGD_HPP
+#define SIPS_CELL_LIST_POTENTIAL_WITH_RR_SGD_HPP
 
 #include <iostream>
 #include <memory>
@@ -29,7 +29,7 @@ namespace ha{
 // slot is assigned to pairs before the overlap is evaluated
 // c \in [-1, 0]
     // if c = 0: ij and ji use independent slots
-    // if not: ij and ji shares the slot with probability $c$
+    // if not: ij and ji shares the slot with probability ((-1) * c)
 
 // equation of motion: \Delta[x}_{i} = -\alpha \theta_{ji} \nabla_{i} V_{ji}
 
@@ -68,14 +68,14 @@ protected:
             // first sample u~Unif(0, 1) for hi
             // if K == 1 or c == -1 hi-lo and lo-hi share a slot
             // else if u < ((-1) * c), hi-lo and lo-hi share a slot
-            // else, secondly sample another slot with new hash
-                // ==> corr(\theta_{ji},\,\theta_{ij}) = -c.
+            // else, secondly sample another slot with new hash to decide lo
+                // ==> corr(\theta_{ji},\,\theta_{ij}) = ((-1) * c).
         const std::uint64_t h = rr_sgd_mix(
             m_seed
             ^ (std::uint64_t(lo) + 0x9E3779B97F4A7C15ULL)
             ^ (std::uint64_t(hi) << 32)
             ^ (std::uint64_t(epoch) * 0xD1B54A32D192ED03ULL));
-        // u is uniform on [0, 1). Share a slot with probability -c.
+        // u is uniform on [0, 1). Share a slot with probability ((-1) * c).
         const double u = double(h >> 11) * (1.0 / 9007199254740992.0);
         const bool share = (m_K == 1) || (u < -m_c);
         if(share){
